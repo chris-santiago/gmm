@@ -60,7 +60,8 @@ class BaseGMM:
             res = []
             for i in range(data.shape[0]):
                 res.append(
-                    self.resp[i, k] * (data[i, :] - self.means[k]) * (data[i, :] - self.means[k]).reshape(-1, 1))
+                    self.resp[i, k] * (data[i, :] - self.means[k]) * (data[i, :] - self.means[k]).reshape(-1, 1)
+                )
             self.covs[k] = np.array(res).sum(0) / self.resp[:, k].sum()
             self.weights[k] = self.resp[:, k].sum(0) / data.shape[0]
 
