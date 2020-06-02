@@ -6,7 +6,7 @@ from sklearn import datasets
 
 
 class LowRankGMM(BaseGMM):
-    def __init__(self, k, r, tol=1e-4, max_iter=100):
+    def __init__(self, k, r, tol=1e-4, max_iter=300):
         super().__init__(k, tol, max_iter)
         self.K = k
         self.R = r
@@ -35,6 +35,7 @@ class LowRankGMM(BaseGMM):
             mu_approx = self.means[k] @ eigvecs
             self.resp[:, k] = self.weights[k] * (1 / np.sqrt(np.prod(eigvals))) * np.exp(
                 (-1 / 2) * np.sum(((data_approx - mu_approx) ** 2) / eigvals, axis=1))
+        self.update_loglikelihood()
         self.normalize_resp()
 
 
@@ -50,6 +51,6 @@ def main_iris():
 
 def main():
     data, labels = load_data_labels('data/data.mat', 'data/label.mat')
-    gmm = LowRankGMM(k=2, r=100)
+    gmm = LowRankGMM(k=2, r=100, max_iter=5, tol=1)
     gmm.fit(data)
     print(gmm.plot_likelihoods())

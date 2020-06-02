@@ -4,6 +4,7 @@ import scipy.stats
 import scipy.linalg
 import matplotlib.pyplot as plt
 from sklearn import datasets
+from tqdm import tqdm
 
 
 def load_data_labels(data_file: str, label_file: str):
@@ -52,6 +53,7 @@ class BaseGMM:
                 mean=self.means[k],
                 cov=self.covs[k]
             )
+        self.update_loglikelihood()
         self.normalize_resp()
 
     def m_step(self, data):
@@ -78,13 +80,16 @@ class BaseGMM:
         self.initialize(data)
         curr_iter = 0
         converged = False
+        pbar = tqdm(total=self.max_iter)
         while not converged and curr_iter < self.max_iter:
             self.e_step(data)
             self.m_step(data)
-            self.update_loglikelihood()
+            # self.update_loglikelihood()
             if curr_iter > 1:
                 converged = self.is_converged(curr_iter)
             curr_iter += 1
+            pbar.update()
+        pbar.close()
 
     def plot_likelihoods(self):
         plt.plot(self.likelihoods)
@@ -98,7 +103,7 @@ def main():
     iris = datasets.load_iris()
     data = iris.data
     labels = iris.target
-    gmm = BaseGMM(3)
+    gmm = BaseGMM(3, tol=1e-4)
     gmm.fit(data)
 
 if __name__ == '__main__':

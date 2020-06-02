@@ -40,6 +40,9 @@ while not converged and curr_iter < 100:
         mu_approx = means[k] @ eigvecs
         resp[:, k] = weights[k] * (1 / np.sqrt(np.prod(eigvals))) * np.exp((-1/2) * np.sum(((data_approx - mu_approx) ** 2) / eigvals, axis=1))
 
+    log_likelihood = np.sum(np.log(np.sum(resp, axis=1)))
+    likelihoods.append(log_likelihood)
+
     # normalize
     resp = resp / resp.sum(axis=1, keepdims=1)
 
@@ -51,9 +54,6 @@ while not converged and curr_iter < 100:
         covs[k] = np.array(res).sum(0) / resp[:, k].sum()
         weights[k] = resp[:, k].sum(0) / data.shape[0]
 
-    log_likelihood = np.sum(np.log(np.sum(resp, axis=1)))
-    likelihoods.append(log_likelihood)
-    
     if curr_iter > 1:
         converged = abs(likelihoods[curr_iter] - likelihoods[curr_iter-1]) < 1e-4
     curr_iter += 1
